@@ -182,7 +182,10 @@ export default function ShoppingList() {
             <Table>
               <TableBody>
                 {shoppingItems.map((item, index) => (
-                  <TableRow key={index} className={clsx(!item.active && "opacity-30")}>
+                  <TableRow
+                    key={index}
+                    className={clsx(!item.active && "opacity-30")}
+                  >
                     <TableCell className="p-2">{item.name}</TableCell>
                     <TableCell className="p-2">
                       <div className="flex justify-end items-center gap-x-1">
@@ -252,9 +255,11 @@ export default function ShoppingList() {
                   </div>
                 </div>
                 <DrawerFooter>
-                  <Button type="button" onClick={addShoppingItem}>
-                    追加する
-                  </Button>
+                  <DrawerClose asChild>
+                    <Button type="button" onClick={addShoppingItem}>
+                      追加する
+                    </Button>
+                  </DrawerClose>
                 </DrawerFooter>
               </div>
             </DrawerContent>
