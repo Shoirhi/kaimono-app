@@ -229,12 +229,7 @@ export default function ShoppingList() {
                 <Plus className="h-4 w-4" />
               </Button>
             </DrawerTrigger>
-            <DrawerContent
-              onOpenAutoFocus={(e) => {
-                e.preventDefault();
-                focusToNameInput();
-              }}
-            >
+            <DrawerContent>
               <div className="mx-auto w-full max-w-sm">
                 <DrawerHeader>
                   <DrawerTitle>商品を入力</DrawerTitle>
