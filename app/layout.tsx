@@ -4,6 +4,7 @@ import "./globals.css";
 export const runtime = 'edge';
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kaimono-app.pages.dev"),
   title: "買い物",
 }
 
