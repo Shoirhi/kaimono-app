@@ -49,10 +49,10 @@ export default function ShoppingList() {
   const [newShoppingItemPrice, setNewShoppingItemPrice] = useState<number | "">(
     ""
   );
-  const [showResetDialog, setShowResetDialog] = useState<boolean>(false);
   const [totalPrice, setTotalPrice] = useState<number>(
     calculateTotalPrice(shoppingItems)
   );
+  const [availableButton, setAvailableButton] = useState<boolean>(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,6 +91,7 @@ export default function ShoppingList() {
 
       setShoppingItemsAdvance([...shoppingItems, newItem]);
 
+      setAvailableButton(false);
       setNewShoppingItemName("");
       setNewShoppingItemPrice("");
 
@@ -98,7 +99,16 @@ export default function ShoppingList() {
     }
   }
 
+  function checkAvailableSubmit() {
+    if (newShoppingItemName && newShoppingItemPrice) {
+      setAvailableButton(true);
+    } else {
+      setAvailableButton(false);
+    }
+  }
+
   function focusToNameInput() {
+    console.log("focus");
     if (nameInputRef.current) {
       nameInputRef.current.focus();
     }
@@ -112,11 +122,11 @@ export default function ShoppingList() {
     if (value === "" || isNumeric(value)) {
       setNewShoppingItemPrice(Number(value));
     }
+    checkAvailableSubmit();
   }
 
   function resetShoppingItems() {
     setShoppingItemsAdvance([]);
-    setShowResetDialog(false);
   }
 
   function triggerActivation(index: number) {
@@ -132,98 +142,99 @@ export default function ShoppingList() {
 
   return (
     <>
-      <Drawer>
-        <div className="container py-3 border-b sticky top-0 bg-neutral-50 shadow">
-          <div className="grid grid-cols-2 gap-x-4">
-            <div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    onClick={() => setShowResetDialog(true)}
-                  >
-                    リセット
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>リセット</DialogTitle>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <p className="text-center">
-                      リセットしますか？
-                      <br />
-                      この操作は元には戻せません。
-                    </p>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button
-                        variant="destructive"
-                        type="button"
-                        onClick={resetShoppingItems}
-                      >
-                        リセットする
-                      </Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <div className="text-right">
-              ￥<span className="text-3xl font-bold pl-1">{totalPrice}</span>
-            </div>
-            <div></div>
+      <div className="container py-3 border-b sticky top-0 bg-neutral-50 shadow z-10">
+        <div className="grid grid-cols-2 gap-x-4">
+          <div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" type="button">
+                  リセット
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>リセット</DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <p className="text-center">
+                    リセットしますか？
+                    <br />
+                    この操作は元には戻せません。
+                  </p>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button
+                      variant="destructive"
+                      type="button"
+                      onClick={resetShoppingItems}
+                    >
+                      リセットする
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
+          <div className="text-right">
+            ￥<span className="text-3xl font-bold pl-1">{totalPrice}</span>
+          </div>
+          <div></div>
         </div>
-        <div className="container py-4">
-          {shoppingItems.length ? (
-            <Table>
-              <TableBody>
-                {shoppingItems.map((item, index) => (
-                  <TableRow
-                    key={index}
-                    className={clsx(!item.active && "opacity-30")}
-                  >
-                    <TableCell className="p-2">{item.name}</TableCell>
-                    <TableCell className="p-2">
-                      <div className="flex justify-end items-center gap-x-1">
-                        <div className="text-right">
-                          ￥
-                          <span className="text-xl font-bold pl-1">
-                            {item.price}
-                          </span>
-                        </div>
-                        <Button
-                          onClick={() => triggerActivation(index)}
-                          variant="ghost"
-                          size="icon"
-                        >
-                          {item.active ? (
-                            <Eye className="w-3 h-3" />
-                          ) : (
-                            <EyeOff className="w-3 h-3" />
-                          )}
-                        </Button>
+      </div>
+      <div className="pt-5 pb-20">
+        {shoppingItems.length ? (
+          <Table>
+            <TableBody>
+              {shoppingItems.map((item, index) => (
+                <TableRow
+                  key={index}
+                  className={clsx(!item.active && "opacity-30")}
+                >
+                  <TableCell className="py-2">{item.name}</TableCell>
+                  <TableCell className="py-2">
+                    <div className="flex justify-end items-center gap-x-1">
+                      <div className="text-right">
+                        ￥
+                        <span className="text-xl font-bold pl-1">
+                          {item.price}
+                        </span>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <p className="text-center">アイテムを追加してください。</p>
-          )}
-        </div>
-        <div className="fixed left-0 bottom-0 right-0 container py-3 border-t bg-neutral-50 shadow">
-          <div className="flex justify-center">
+                      <Button
+                        onClick={() => triggerActivation(index)}
+                        variant="ghost"
+                        size="icon"
+                      >
+                        {item.active ? (
+                          <Eye className="w-3 h-3" />
+                        ) : (
+                          <EyeOff className="w-3 h-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <p className="text-center">アイテムを追加してください。</p>
+        )}
+      </div>
+      <div className="fixed left-0 bottom-0 right-0 container py-3 border-t bg-neutral-50 shadow">
+        <div className="flex justify-center">
+          <Drawer>
             <DrawerTrigger asChild>
               <Button variant="outline" onClick={focusToNameInput} size="icon">
                 <Plus className="h-4 w-4" />
               </Button>
             </DrawerTrigger>
-            <DrawerContent>
+            <DrawerContent
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+                focusToNameInput();
+              }}
+            >
               <div className="mx-auto w-full max-w-sm">
                 <DrawerHeader>
                   <DrawerTitle>商品を入力</DrawerTitle>
@@ -231,7 +242,7 @@ export default function ShoppingList() {
                 <div className="p-4 space-y-4">
                   <Input
                     className="text-xl"
-                    placeholder="パン"
+                    placeholder="商品名"
                     type="text"
                     ref={nameInputRef}
                     value={newShoppingItemName}
@@ -243,10 +254,13 @@ export default function ShoppingList() {
                     <div className="max-w-28">
                       <Input
                         className="text-2xl text-right"
-                        placeholder="298"
+                        placeholder="価格"
                         type="tel"
                         value={newShoppingItemPrice}
-                        onChange={(e) => onChangePrice(e.target.value)}
+                        onChange={(e) => {
+                          onChangePrice(e.target.value);
+                          checkAvailableSubmit();
+                        }}
                         onKeyDown={(e) =>
                           e.key === "Enter" && addShoppingItem()
                         }
@@ -255,17 +269,23 @@ export default function ShoppingList() {
                   </div>
                 </div>
                 <DrawerFooter>
-                  <DrawerClose asChild>
-                    <Button type="button" onClick={addShoppingItem}>
+                  {availableButton ? (
+                    <DrawerClose asChild>
+                      <Button type="button" onClick={addShoppingItem}>
+                        追加する
+                      </Button>
+                    </DrawerClose>
+                  ) : (
+                    <Button type="button" disabled>
                       追加する
                     </Button>
-                  </DrawerClose>
+                  )}
                 </DrawerFooter>
               </div>
             </DrawerContent>
-          </div>
+          </Drawer>
         </div>
-      </Drawer>
+      </div>
     </>
   );
 }
