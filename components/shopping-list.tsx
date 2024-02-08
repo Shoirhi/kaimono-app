@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import clsx from "clsx";
 import {
   Drawer,
   DrawerClose,
@@ -32,7 +33,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
+import { Plus, Eye, EyeOff } from "lucide-react";
 
 type ShoppingItem = {
   name: string;
@@ -93,9 +94,13 @@ export default function ShoppingList() {
       setNewShoppingItemName("");
       setNewShoppingItemPrice("");
 
-      if (nameInputRef.current) {
-        nameInputRef.current.focus();
-      }
+      focusToNameInput();
+    }
+  }
+
+  function focusToNameInput() {
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
     }
   }
 
@@ -112,6 +117,17 @@ export default function ShoppingList() {
   function resetShoppingItems() {
     setShoppingItemsAdvance([]);
     setShowResetDialog(false);
+  }
+
+  function triggerActivation(index: number) {
+    const currentShoppingItems = shoppingItems;
+
+    currentShoppingItems[index].active = currentShoppingItems[index].active
+      ? false
+      : true;
+
+    setShoppingItemsAdvance(currentShoppingItems);
+    setTotalPrice(calculateTotalPrice(shoppingItems));
   }
 
   return (
@@ -166,13 +182,28 @@ export default function ShoppingList() {
             <Table>
               <TableBody>
                 {shoppingItems.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="text-lg">{item.name}</TableCell>
-                    <TableCell className="text-right">
-                      ￥
-                      <span className="text-2xl font-bold pl-1">
-                        {item.price}
-                      </span>
+                  <TableRow key={index} className={clsx(!item.active && "opacity-30")}>
+                    <TableCell className="p-2">{item.name}</TableCell>
+                    <TableCell className="p-2">
+                      <div className="flex justify-end items-center gap-x-1">
+                        <div className="text-right">
+                          ￥
+                          <span className="text-xl font-bold pl-1">
+                            {item.price}
+                          </span>
+                        </div>
+                        <Button
+                          onClick={() => triggerActivation(index)}
+                          variant="ghost"
+                          size="icon"
+                        >
+                          {item.active ? (
+                            <Eye className="w-3 h-3" />
+                          ) : (
+                            <EyeOff className="w-3 h-3" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -185,7 +216,7 @@ export default function ShoppingList() {
         <div className="fixed left-0 bottom-0 right-0 container py-3 border-t bg-neutral-50 shadow">
           <div className="flex justify-center">
             <DrawerTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" onClick={focusToNameInput} size="icon">
                 <Plus className="h-4 w-4" />
               </Button>
             </DrawerTrigger>
