@@ -1,5 +1,38 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogClose,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 
 type ShoppingItem = {
   name: string;
@@ -83,47 +116,120 @@ export default function ShoppingList() {
 
   return (
     <>
-      {showResetDialog && (
-        <div>
-          <p>本当にリセットしますか？</p>
-          <button type="button" onClick={resetShoppingItems}>
-            リセットする
-          </button>
+      <Drawer>
+        <div className="container py-3 border-b sticky top-0 bg-neutral-50 shadow">
+          <div className="grid grid-cols-2 gap-x-4">
+            <div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    onClick={() => setShowResetDialog(true)}
+                  >
+                    リセット
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>リセット</DialogTitle>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <p className="text-center">
+                      リセットしますか？
+                      <br />
+                      この操作は元には戻せません。
+                    </p>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button
+                        variant="destructive"
+                        type="button"
+                        onClick={resetShoppingItems}
+                      >
+                        リセットする
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="text-right">
+              ￥<span className="text-3xl font-bold pl-1">{totalPrice}</span>
+            </div>
+            <div></div>
+          </div>
         </div>
-      )}
-      <div>
-        <button type="button" onClick={() => setShowResetDialog(true)}>
-          リセット
-        </button>
-        {shoppingItems.length ? (
-        <ul>
-          {shoppingItems.map((item, index) => (
-            <li key={index}>
-              {item.name}, {item.price}
-            </li>
-          ))}
-        </ul>
-
-        ) : (
-          <p>アイテムを追加してください。</p>
-        )}
-        <input
-          type="text"
-          ref={nameInputRef}
-          value={newShoppingItemName}
-          onChange={(e) => setNewShoppingItemName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addShoppingItem()}
-        />
-        <input
-          value={newShoppingItemPrice}
-          onChange={(e) => onChangePrice(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addShoppingItem()}
-        />
-        <button type="button" onClick={addShoppingItem}>
-          保存
-        </button>
-        <div>合計：{totalPrice}</div>
-      </div>
+        <div className="container py-4">
+          {shoppingItems.length ? (
+            <Table>
+              <TableBody>
+                {shoppingItems.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-lg">{item.name}</TableCell>
+                    <TableCell className="text-right">
+                      ￥
+                      <span className="text-2xl font-bold pl-1">
+                        {item.price}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-center">アイテムを追加してください。</p>
+          )}
+        </div>
+        <div className="fixed left-0 bottom-0 right-0 container py-3 border-t bg-neutral-50 shadow">
+          <div className="flex justify-center">
+            <DrawerTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="mx-auto w-full max-w-sm">
+                <DrawerHeader>
+                  <DrawerTitle>商品を入力</DrawerTitle>
+                </DrawerHeader>
+                <div className="p-4 space-y-4">
+                  <Input
+                    className="text-xl"
+                    placeholder="パン"
+                    type="text"
+                    ref={nameInputRef}
+                    value={newShoppingItemName}
+                    onChange={(e) => setNewShoppingItemName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addShoppingItem()}
+                  />
+                  <div className="flex justify-end items-center gap-x-2">
+                    <div className="font-bold text-2xl">￥</div>
+                    <div className="max-w-28">
+                      <Input
+                        className="text-2xl text-right"
+                        placeholder="298"
+                        type="tel"
+                        value={newShoppingItemPrice}
+                        onChange={(e) => onChangePrice(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && addShoppingItem()
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+                <DrawerFooter>
+                  <Button type="button" onClick={addShoppingItem}>
+                    追加する
+                  </Button>
+                </DrawerFooter>
+              </div>
+            </DrawerContent>
+          </div>
+        </div>
+      </Drawer>
     </>
   );
 }
