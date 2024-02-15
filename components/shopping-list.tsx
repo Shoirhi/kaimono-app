@@ -100,7 +100,6 @@ export default function ShoppingList() {
   }
 
   function focusToNameInput() {
-    console.log("focus");
     if (nameInputRef.current) {
       nameInputRef.current.focus();
     }
