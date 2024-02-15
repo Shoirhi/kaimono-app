@@ -6,6 +6,7 @@ export const runtime = 'edge';
 export const metadata: Metadata = {
   metadataBase: new URL("https://kaimono-app.pages.dev"),
   title: "買い物",
+  viewport: "width=device-width,initial-scale=1.0,maximum-scale=1.0"
 }
 
 export default function RootLayout({
