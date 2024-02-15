@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
+import type { Viewport } from "next";
 import "./globals.css";
 
-export const runtime = 'edge';
+export const runtime = "edge";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kaimono-app.pages.dev"),
   title: "買い物",
-  viewport: "width=device-width,initial-scale=1.0,maximum-scale=1.0"
-}
+  description: "買い物アプリ",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default function RootLayout({
   children,
@@ -22,9 +30,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#b8e986" />
       </head>
       <body className="flex flex-col min-h-dvh">
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </body>
     </html>
   );
