@@ -82,7 +82,7 @@ export default function ShoppingList() {
   }
 
   function addShoppingItem() {
-    if (newShoppingItemName && newShoppingItemPrice) {
+    if (newShoppingItemPrice) {
       const newItem = {
         name: newShoppingItemName,
         price: Number(newShoppingItemPrice),
@@ -99,14 +99,6 @@ export default function ShoppingList() {
     }
   }
 
-  function checkAvailableSubmit() {
-    if (newShoppingItemName && newShoppingItemPrice) {
-      setAvailableButton(true);
-    } else {
-      setAvailableButton(false);
-    }
-  }
-
   function focusToNameInput() {
     console.log("focus");
     if (nameInputRef.current) {
@@ -118,11 +110,14 @@ export default function ShoppingList() {
     return /^-?\d+(\.\d+)?$/.test(value);
   }
 
-  function onChangePrice(value: string) {
-    if (value === "" || isNumeric(value)) {
+  function onItemPriceChange(value: string) {
+    if (value && !value.startsWith("0") && isNumeric(value)) {
       setNewShoppingItemPrice(Number(value));
+      setAvailableButton(true);
+    } else {
+      setNewShoppingItemPrice("");
+      setAvailableButton(false);
     }
-    checkAvailableSubmit();
   }
 
   function resetShoppingItems() {
@@ -138,6 +133,11 @@ export default function ShoppingList() {
 
     setShoppingItemsAdvance(currentShoppingItems);
     setTotalPrice(calculateTotalPrice(shoppingItems));
+  }
+
+  function onItemNameChange(name: string) {
+    const newName = name;
+    setNewShoppingItemName(newName);
   }
 
   return (
@@ -182,7 +182,7 @@ export default function ShoppingList() {
           <div></div>
         </div>
       </div>
-      <div className="pt-5 pb-20">
+      <div className="pt-5 pb-40">
         {shoppingItems.length ? (
           <Table>
             <TableBody>
@@ -222,63 +222,50 @@ export default function ShoppingList() {
         )}
       </div>
       <div className="fixed left-0 bottom-0 right-0 container py-3 border-t bg-neutral-50 shadow">
-        <div className="flex justify-center">
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button variant="outline" onClick={focusToNameInput} size="icon">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <div className="mx-auto w-full max-w-sm">
-                <DrawerHeader>
-                  <DrawerTitle>商品を入力</DrawerTitle>
-                </DrawerHeader>
-                <div className="p-4 space-y-4">
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <div className="flex flex-col gap-2">
+              <Input
+                className="text"
+                placeholder="商品名"
+                type="text"
+                ref={nameInputRef}
+                value={newShoppingItemName}
+                onChange={(e) => onItemNameChange(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addShoppingItem()}
+              />
+              <div className="flex justify-end items-center gap-x-2">
+                <div className="font-bold text">￥</div>
+                <div className="max-w-28">
                   <Input
-                    className="text-xl"
-                    placeholder="商品名"
-                    type="text"
-                    ref={nameInputRef}
-                    value={newShoppingItemName}
-                    onChange={(e) => setNewShoppingItemName(e.target.value)}
+                    className="text text-right"
+                    placeholder="価格"
+                    type="tel"
+                    value={newShoppingItemPrice}
+                    onChange={(e) => {
+                      onItemPriceChange(e.target.value);
+                    }}
                     onKeyDown={(e) => e.key === "Enter" && addShoppingItem()}
                   />
-                  <div className="flex justify-end items-center gap-x-2">
-                    <div className="font-bold text-2xl">￥</div>
-                    <div className="max-w-28">
-                      <Input
-                        className="text-2xl text-right"
-                        placeholder="価格"
-                        type="tel"
-                        value={newShoppingItemPrice}
-                        onChange={(e) => {
-                          onChangePrice(e.target.value);
-                          checkAvailableSubmit();
-                        }}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && addShoppingItem()
-                        }
-                      />
-                    </div>
-                  </div>
                 </div>
-                <DrawerFooter>
-                  {availableButton ? (
-                    <DrawerClose asChild>
-                      <Button type="button" onClick={addShoppingItem}>
-                        追加する
-                      </Button>
-                    </DrawerClose>
-                  ) : (
-                    <Button type="button" disabled>
-                      追加する
-                    </Button>
-                  )}
-                </DrawerFooter>
               </div>
-            </DrawerContent>
-          </Drawer>
+            </div>
+          </div>
+          <div>
+            {availableButton ? (
+              <Button
+                className="h-full"
+                type="button"
+                onClick={addShoppingItem}
+              >
+                追加する
+              </Button>
+            ) : (
+              <Button className="h-full" type="button" disabled>
+                追加する
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </>
